@@ -1,11 +1,13 @@
 library(SpilloverDA)
 Sys.setenv("ANNOTATOR_DB_PATH" = "")
 
-SpilloverDA:::checkEpitatorDB()
-Sys.setenv("ANNOTATOR_DB_PATH" = file.path(getwd(), ".epitator.sqlitedb"))
+SpilloverDA:::checkEpitatorDB(error = FALSE)
+
+Sys.setenv("ANNOTATOR_DB_PATH" = file.path(tempdir(), ".epitator.sqlitedb"))
 SpilloverDA:::getEpitatorDBFilename()
 
+status = SpilloverDA:::checkEpitatorDB(error = FALSE)
+stopifnot(!status)
 
 tt = try(SpilloverDA:::checkEpitatorDB())
-if(!is(tt, "try-error"))
-    stop("checkEpitatorDB found database in installed dir")
+stopifnot(is(tt, "try-error"))
