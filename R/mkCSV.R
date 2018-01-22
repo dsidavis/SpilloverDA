@@ -1,18 +1,5 @@
-getX = function(f, ext = "xml", pdfs =  list.files("../LatestDocs/PDF", recursive = TRUE, full = TRUE, pattern = "\\.pdf$"))
-          gsub("pdf$", ext, grep(gsub("\\.rds", "", basename(f)), pdfs, val = TRUE))
-
-o = function(f) opdf(getX(f, "pdf"))
-
-if(FALSE) {
-dir = "ecoJSON-body"
-ff = list.files(dir, pattern = "rds$", full = TRUE)
-
-sp = readRDS("../matchSpecies.rds")
-}
-
 # For a given rds file, we create a data frame then CSV file
 # with truth and results for
-
 
 if(FALSE) {
  z = mkCSV(ff[1], write = TRUE, jvar = getDiagTest, spVar = "most_specific_diagnostic_Test")
@@ -27,15 +14,15 @@ mkCSV =
     #
     # jdata - 
     #
-function(f, eco = readRDS(f),
+function(eco, xlsxFile = character(),
          obs = grep(gsub("rds", "", basename(f)), species$PDF, fixed = TRUE),
          species = NULL, # the data.frame from Species.csv
          spVar = c("Country", "State", "City", "Location", "Region"),
          spFixed = c("reference_ID", "PDF"),
          jvar = getLocation,
          write = TRUE,
-         jdata = jvar(eco),
-         xlsxFile = outFilename(f))
+         jdata = jvar(eco)
+         )
 {
     if(!is.null(species)) {
        fx = sp[obs, c(spFixed, spVar)]
@@ -49,16 +36,16 @@ function(f, eco = readRDS(f),
        fx = as.data.frame(lapply(fx, function(x) c(x, rep("", n-nrow(fx)))), stringsAsFactors = FALSE)
        fx$PDF = gsub("internal-pdf://", "", fx$PDF)
        ans = cbind(fx, section = rep("", n), correct = rep(FALSE, n), ans)
-     } else
-       ans = obs
+     } else 
+       ans = eco
+
         
        # Clean up a character that causes Excel to barf.
     ans = fixCharacters(ans)
 
-    if(write) {
+    if(write) 
         createXLSX(ans, xlsxFile)
                    # sprintf("file:///Users/duncan/DSIProjects/Zoonotics-shared/EcoResults/bob.html#%d", 1:nrow(ans)))
-    }
 
     ans
 }
@@ -67,18 +54,27 @@ fixCharacters =
 function(df)
 {
     w = sapply(df, is.character)
-    df[w] = lapply(df[w], function(x) gsub("\031", "'", stringi::stri_trans_general(x, id = "latin-ascii")))
+    if(require(stringi))
+      df[w] = lapply(df[w], stringi::stri_trans_general, id = "latin-ascii")
+    df[w] = lapply(df[w], function(x) gsub("\031", "'", x))
     df
 }            
     
 outFilename =
 function(f, ext = "xlsx", dir = "CSV")    
-  sprintf("%s/%s.%s", dir, gsub("\\.rds", "", basename(f)), ext)    
+{
+    sprintf("%s/%s.%s", dir, gsub("\\.rds", "", basename(f)), ext)
+}
 
 
 createXLSX.simple =
-function(df, filename)    
-    write.xlsx(df, filename)
+function(df, filename)
+{
+   if(require("openxlsx"))
+       write.xlsx(df, filename)
+   else
+       stop("package openxlsx is not available" )
+}
 
 createXLSX =
     # Second version that adds hyperlinks to the matches.
@@ -104,3 +100,16 @@ function(df, filename, links, addLinks = !missing(links))
     filename
 }
 
+
+
+
+#getX = function(f, ext = "xml", pdfs =  list.files("../LatestDocs/PDF", recursive = TRUE, full = TRUE, pattern = "\\.pdf$"))
+#          gsub("pdf$", ext, grep(gsub("\\.rds", "", basename(f)), pdfs, val = TRUE))
+
+
+if(FALSE) {
+dir = "ecoJSON-body"
+ff = list.files(dir, pattern = "rds$", full = TRUE)
+
+sp = readRDS("../matchSpecies.rds")
+}
