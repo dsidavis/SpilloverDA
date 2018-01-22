@@ -30,3 +30,13 @@ have different local versions of EpiTator that we can switch between very easily
 
 
 
+To use the epitator code, we use Python3.
+Using pip3, install all the required python modules
+```
+pip3 install -r requirements.txt 
+```
+or with
+```
+sudo -H pip3 install -r requirements.txt 
+```
+
