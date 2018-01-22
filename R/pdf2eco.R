@@ -4,7 +4,7 @@
 xml2eco =
     # Handle a PDF file as well.
 function(XML, ecoextract = getEcoExtractPyScript(),
-         results_dir = "ecoJSON", cache.dir = "sections")
+         results_dir = character(), cache.dir = character())
 {
     if(length(cache.dir) && !is.na(cache.dir))  {
        if(!dir.exists(cache.dir))
@@ -117,7 +117,7 @@ function(db = getEpitatorDBFilename(), error = TRUE)
 {
     status = file.exists(db)
     if(error && !status)
-        stop("Epitator SQLite database doesn't exist in ", db)
+        stop("Epitator SQLite database doesn't exist: ", db)
 
     status
 }
