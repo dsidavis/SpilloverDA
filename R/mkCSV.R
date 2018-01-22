@@ -54,8 +54,8 @@ fixCharacters =
 function(df)
 {
     w = sapply(df, is.character)
-    if(require(stringi))
-      df[w] = lapply(df[w], stringi::stri_trans_general, id = "latin-ascii")
+#    if(require(stringi))
+    df[w] = lapply(df[w], stri_trans_general, id = "latin-ascii")
     df[w] = lapply(df[w], function(x) gsub("\031", "'", x))
     df
 }            

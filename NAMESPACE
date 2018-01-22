@@ -4,7 +4,7 @@ export(mkCSV) # Rename this to xlsx
 
 import(ReadPDF)
 import(RJSONIO)
-#import(stringi)
+import(stringi)
 
 
 export(getLocation, getMisc, getVirus, getSpecies, getDiagTest)
