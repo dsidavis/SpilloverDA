@@ -4,7 +4,8 @@ Title: Munging and Exploring the Viral Spillover Data Set
 Authors: Matt Espe, Duncan Temple Lang
 Maintainer: Duncan Temple Lang <dtemplelang@ucdavis.edu>
 Imports: ReadPDF,
-	 RJSONIO
+	 RJSONIO,
+	 stringi
 xSuggests: ggplot2,
  	  readxl,
 	  openxlsx,	 

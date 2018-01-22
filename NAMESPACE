@@ -4,3 +4,4 @@ export(mkCSV) # Rename this to xlsx
 
 import(ReadPDF)
 import(RJSONIO)
+import(stringi)

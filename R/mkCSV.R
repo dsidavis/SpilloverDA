@@ -27,33 +27,34 @@ mkCSV =
     #
     # jdata - 
     #
-function(f, obs = grep(gsub("rds", "", basename(f)), species$PDF, fixed = TRUE), species = sp,
-         eco = readRDS(f),
+function(f, eco = readRDS(f),
+         obs = grep(gsub("rds", "", basename(f)), species$PDF, fixed = TRUE),
+         species = NULL, # the data.frame from Species.csv
          spVar = c("Country", "State", "City", "Location", "Region"),
          spFixed = c("reference_ID", "PDF"),
          jvar = getLocation,
          write = TRUE,
          jdata = jvar(eco),
          xlsxFile = outFilename(f))
-{    
-    fx = sp[obs, c(spFixed, spVar)]
-    # Only grab the unique rows
-    fx = fx[!duplicated(fx),]
-    ans = jdata
-    n = nrow(ans)
+{
+    if(!is.null(species)) {
+       fx = sp[obs, c(spFixed, spVar)]
+        # Only grab the unique rows
+       fx = fx[!duplicated(fx),]
+       ans = jdata
+       n = nrow(ans)
 
-    # Get the fixed part from the manually generated table, i.e. truth
-    # extend the rows with empty cells
-    fx = as.data.frame(lapply(fx, function(x) c(x, rep("", n-nrow(fx)))), stringsAsFactors = FALSE)
-    fx$PDF = gsub("internal-pdf://", "", fx$PDF)
-    ans = cbind(fx, section = rep("", n), correct = rep(FALSE, n), ans)
+        # Get the fixed part from the manually generated table, i.e. truth
+        # extend the rows with empty cells
+       fx = as.data.frame(lapply(fx, function(x) c(x, rep("", n-nrow(fx)))), stringsAsFactors = FALSE)
+       fx$PDF = gsub("internal-pdf://", "", fx$PDF)
+       ans = cbind(fx, section = rep("", n), correct = rep(FALSE, n), ans)
+     } else
+       ans = obs
         
-      # Clean up a character that causes Excel to barf.
-    w = sapply(ans, is.character)
-    ans[w] = lapply(ans[w], function(x) gsub("\031", "'", x))
+       # Clean up a character that causes Excel to barf.
+    ans = fixCharacters(ans)
 
-
-  
     if(write) {
         createXLSX(ans, xlsxFile)
                    # sprintf("file:///Users/duncan/DSIProjects/Zoonotics-shared/EcoResults/bob.html#%d", 1:nrow(ans)))
@@ -62,6 +63,14 @@ function(f, obs = grep(gsub("rds", "", basename(f)), species$PDF, fixed = TRUE),
     ans
 }
 
+fixCharacters =
+function(df)
+{
+    w = sapply(df, is.character)
+    df[w] = lapply(df[w], function(x) gsub("\031", "'", stringi::stri_trans_general(x, id = "latin-ascii")))
+    df
+}            
+    
 outFilename =
 function(f, ext = "xlsx", dir = "CSV")    
   sprintf("%s/%s.%s", dir, gsub("\\.rds", "", basename(f)), ext)    
