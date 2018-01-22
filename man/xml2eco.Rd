@@ -50,5 +50,7 @@ Matt Espe
 \seealso{
 }
 \examples{
+f = system.fime("sampleDocs", "Rondini-2008-Development of multiplex PCR-liga.xml", package = "SpilloverDA")
+tmp = xml2eco(f)
 }
 \keyword{}
