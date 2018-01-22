@@ -55,9 +55,8 @@ function(f, obs = grep(gsub("rds", "", basename(f)), species$PDF, fixed = TRUE),
 
   
     if(write) {
-        library(openxlsx)
-        createXLSX(ans, xlsxFile,
-                   sprintf("file:///Users/duncan/DSIProjects/Zoonotics-shared/EcoResults/bob.html#%d", 1:nrow(ans)))
+        createXLSX(ans, xlsxFile)
+                   # sprintf("file:///Users/duncan/DSIProjects/Zoonotics-shared/EcoResults/bob.html#%d", 1:nrow(ans)))
     }
 
     ans
@@ -68,14 +67,17 @@ function(f, ext = "xlsx", dir = "CSV")
   sprintf("%s/%s.%s", dir, gsub("\\.rds", "", basename(f)), ext)    
 
 
-createXLSX =
+createXLSX.simple =
 function(df, filename)    
     write.xlsx(df, filename)
 
 createXLSX =
     # Second version that adds hyperlinks to the matches.
-function(df, filename, links, addLinks = FALSE)
+function(df, filename, links, addLinks = !missing(links))
 {
+    if(!addLinks)
+       return(createXLSX.simple(df, filename))
+    
     if(addLinks) {
         df$links = links
         class(df$links) <- "hyperlink"
@@ -93,106 +95,3 @@ function(df, filename, links, addLinks = FALSE)
     filename
 }
 
-getLocation  =
-function(x, full = TRUE)
-{
-    if(full) {
-        tmp = lapply(x, getLocation, full = FALSE)
-        # browser()
-        ans = do.call(rbind, tmp)
-        ans$sectionName = rep(names(x), sapply(tmp, function(x) if(is.null(x)) 0 else nrow(x)))        
-        ans
-    } else {
-        # try-errors break this
-        if(is(x, "try-error"))
-            return(data.frame(label = "try-error",
-                              countryCode = NA, start = NA, end = NA, score = NA,
-                              namesUsed = NA, parent = NA, parentNamesUsed = NA,
-                              stringsAsFactors = FALSE))
-        # browser()
-        do.call(rbind, lapply(x$location, getLocationFun))
-    }
-}
-
-getLocationFun =
-function(x)
-             data.frame(label = x$label,
-               countryCode = x$geoname$country_code,
-               start = x$textOffsets[[1]][1],
-               end = x$textOffsets[[1]][2],
-               score = x$geoname$score,
-               namesUsed = x$geoname$names_used,
-               parent = paste(sapply(x$geoname$parents, `[[`, "name"), collapse = ";"),
-               parentNamesUsed = paste(sapply(x$geoname$parents, `[[`, "names_used"), collapse = ";"),
-               stringsAsFactors = FALSE)    
-
-
-getVirus =
-function(res, full = TRUE)
-{
-  getMisc(res, full, type = "disease")
-}
-
-getSpecies =
-function(res, full = TRUE)
-{
-  getMisc(res, full, type = "species")
-}
-
-getDiagTest =
-function(res, full = TRUE)
-{
-  getMisc(res, full, type = "diagnostic_test")
-}
-
-
-
-getMisc =
-    # toplevel
-    # For now assume res is by section
-    #
-    #  section named (rep), span, diseaseName(s - but as ;-separated string)
-    #
-function(res, full = TRUE, type = "disease")
-{
-    tmp = lapply(names(res), function(nm) getVirusSection(res[[nm]], nm, type = type))
-    do.call(rbind, tmp)
-}
-
-getVirusSection =
-function(sec, nm, type = "disease")
-{
-    bad = data.frame(start = integer(), end = integer(), disease = character())
-    if(!("resolved_keyword" %in% names(sec)))
-        return(bad)
-    
-    w = sapply(sec$resolved_keyword, function(x) all(sapply(x$resolutions, function(x) x$entity["type"]) == type))
-    if(!any(w))
-        return(bad)
-    ans = do.call(rbind, lapply(sec$resolved_keyword[w], getVirusInfo, type = type))
-    ans$sectionName = nm
-    ans
-}
-
-getVirusInfo =
-    # span and the disease name
-function(kw, type = "disease")    
-{
-    d = getVirusInfoFromResolution(kw$resolutions, type)
-    ans = data.frame(start = kw$textOffsets[[1]][1],
-                     end = kw$textOffsets[[1]][2],
-                     disease = d,
-                     label = kw$label)
-    names(ans)[3] = type
-    ans
-}
-
-getVirusInfoFromResolution =
-function(res, type = "disease")
-{
-    w = sapply(res, function(x) x$entity["type"]) == type
-    if(any(w)) 
-       paste(sapply(res[w], function(x) x$entity["label"]), collapse = ";")
-    else
-       character()
-}

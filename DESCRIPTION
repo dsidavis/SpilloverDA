@@ -3,5 +3,10 @@ Version: 0.1-0
 Title: Munging and Exploring the Viral Spillover Data Set
 Authors: Matt Espe, Duncan Temple Lang
 Maintainer: Duncan Temple Lang <dtemplelang@ucdavis.edu>
-Imports: ggplot2, plotly, readxl
+Imports: ReadPDF,
+	 RJSONIO
+xSuggests: ggplot2,
+ 	  readxl,
+	  openxlsx,	 
+         plotly,	  
 License: BSD

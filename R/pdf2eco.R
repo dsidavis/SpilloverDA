@@ -1,8 +1,8 @@
 # Function to go from a PDF file to JSON
-library(ReadPDF)
-library(RJSONIO)
+
 
 xml2eco =
+    # Handle a PDF file as well.
 function(XML, ecoextract = getEcoExtractPyScript(),
          results_dir = "ecoJSON", cache.dir = "sections")
 {
@@ -75,11 +75,10 @@ fixSectionNames = function(sect_names)
 
 
 readXMLSections =
-function(XML, )
+function(XML)
 {    
     doc = readPDFXML(XML)
 
-        
     title = getDocTitleString(doc)
     abst = findAbstract(doc)
         
@@ -92,4 +91,32 @@ function(XML, )
         allsect = list(body = getDocText(doc))
         
     list(title = title, abstract = abst, allsect)
+}
+
+
+
+getEcoExtractPyScript =
+function()
+{
+  options("EcoExtractScript", system.file("python", "ecoextract.py", package = "SpilloverDA"))
+}
+
+
+getEpitatorDBFilename =
+function()
+{
+    val = Sys.getenv("ANNOTATOR_DB_PATH")
+    if(is.na(val) || val == "")
+        val = path.expand("~/.epitator.sqlitedb")
+    val
+}
+
+checkEpitatorDB =
+function(db = getEpitatorDBFilename(), error = TRUE)
+{
+    status = file.exists(db)
+    if(error && !status)
+        stop("Epitator SQLite database doesn't exist in ", db)
+
+    status
 }
