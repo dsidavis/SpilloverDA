@@ -29,7 +29,7 @@ function(XML, ecoextract = getEcoExtractPyScript(),
     i = grep("references?|cited|acknowledgements?|funding|interests|disclosure", names(ll),
              ignore.case = TRUE, invert = TRUE)
     ll = ll[i]
-    ans = lapply(ll, function(x) try(sect2eco(x)))
+    ans = lapply(ll, function(x) try(sect2eco(x, ecoextract)))
 
     if(length(results_dir) && !is.na(results_dir)) {
         if(!dir.exists(results_dir))
@@ -40,13 +40,14 @@ function(XML, ecoextract = getEcoExtractPyScript(),
     ans
 }
 
-sect2eco = function(section, ecoextract = "EcoHealth/ecoextract.py")
+sect2eco = function(section, ecoextract = getEcoExtractPyScript())
 {
     f = tempfile()
     f2 = tempfile()
 
     cat(section, file = f)
-    system2(ecoextract, args = c(f, f2))
+    #    system2(ecoextract, args = c(f, f2))
+    system2("python3", args = c(ecoextract, f, f2))
     res = fromJSON(f2)
     res$txt = section
     res
@@ -98,7 +99,7 @@ function(XML)
 getEcoExtractPyScript =
 function()
 {
-  options("EcoExtractScript", system.file("python", "ecoextract.py", package = "SpilloverDA"))
+  getOption("EcoExtractScript", system.file("python", "ecoextract.py", package = "SpilloverDA"))
 }
 
 
