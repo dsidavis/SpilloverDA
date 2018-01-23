@@ -91,7 +91,7 @@ function(XML)
     if(is(allsect, "try-error") || length(allsect) > 20)
         allsect = list(body = getDocText(doc))
         
-    list(title = title, abstract = abst, allsect)
+    c(title = title, abstract = abst, allsect)
 }
 
 
