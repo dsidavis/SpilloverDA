@@ -37,7 +37,7 @@ function(eco, xlsxFile = character(),
        fx$PDF = gsub("internal-pdf://", "", fx$PDF)
        ans = cbind(fx, section = rep("", n), correct = rep(FALSE, n), ans)
      } else 
-       ans = eco
+       ans = jdata
 
         
        # Clean up a character that causes Excel to barf.
