@@ -20,6 +20,26 @@ function(x, full = TRUE)
     }
 }
 
+getDate =
+function(x)
+{
+    tmp = lapply(x, "[[", "date")
+    browser()
+    i = sapply(tmp, length)
+    ans = lapply(tmp[i > 0 ], function(x) {
+        ll = do.call(rbind, strsplit(x, ":"))
+        
+        data.frame(span = ll[,1],
+                   text = ll[,2],
+                   range = ll[,3],
+                   stringsAsFactors = FALSE)
+        
+        })
+    ans = do.call(rbind, ans)
+    ans$section = rep(names(x), i)  
+    ans
+}
+
 getLocationFun =
 function(x)
 {    
