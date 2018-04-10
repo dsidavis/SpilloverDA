@@ -4,7 +4,7 @@ xml2eco = function(XML, ecoextract = "EcoHealth/ecoextract.py",
                    results.dir = "ecoJSON", cache.dir = "sections",
                    cache.file = file.path(cache.dir, gsub("xml$", "rds", basename(XML))),
                    section.text = getXMLText(cache.file),
-                   save = FALSE, save_file = file.path(results.dir, gsub("xml$", "rds", basename(XML))))
+                   save = FALSE, save.file = file.path(results.dir, gsub("xml$", "rds", basename(XML))))
 {
     # Clean up special characters
     section.text = lapply(section.text, function(x) gsub('Â|"', "", x))
@@ -16,7 +16,7 @@ xml2eco = function(XML, ecoextract = "EcoHealth/ecoextract.py",
     ans = lapply(section.text, function(x) try(sect2eco(x, ecoextract = ecoextract)))
 
     if(save)
-        saveRDS(ans, save_file)
+        saveRDS(ans, save.file)
     ans
 }
 
