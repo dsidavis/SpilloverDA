@@ -1,19 +1,19 @@
 # Function to go from a PDF file to JSON
 
 xml2eco = function(XML, ecoextract = "EcoHealth/ecoextract.py",
-                   results_dir = "ecoJSON", cache.dir = "sections",
+                   results.dir = "ecoJSON", cache.dir = "sections",
                    cache.file = file.path(cache.dir, gsub("xml$", "rds", basename(XML))),
-                   section_text = getXMLText(cache.file),
-                   save = FALSE, save_file = file.path(results_dir, gsub("xml$", "rds", basename(XML))))
+                   section.text = getXMLText(cache.file),
+                   save = FALSE, save_file = file.path(results.dir, gsub("xml$", "rds", basename(XML))))
 {
     # Clean up special characters
-    section_text = lapply(section_text, function(x) gsub('Â|"', "", x))
+    section.text = lapply(section.text, function(x) gsub('Â|"', "", x))
 
     # Drop references, etc.
-    i = grep("references?|cited|acknowledgements?|funding|interests|disclosure", names(section_text),
+    i = grep("references?|cited|acknowledgements?|funding|interests|disclosure", names(section.text),
              ignore.case = TRUE, invert = TRUE)
-    section_text = section_text[i]
-    ans = lapply(section_text, function(x) try(sect2eco(x, ecoextract = ecoextract)))
+    section.text = section.text[i]
+    ans = lapply(section.text, function(x) try(sect2eco(x, ecoextract = ecoextract)))
 
     if(save)
         saveRDS(ans, save_file)
