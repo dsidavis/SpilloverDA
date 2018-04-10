@@ -1,4 +1,4 @@
-export(xml2eco)
+export(doc2eco)
 
 export(mkCSV) # Rename this to xlsx
 
@@ -10,5 +10,4 @@ import(stringi)
 export(getLocation, getMisc, getVirus, getSpecies,
        getDiagTest, getCountry)
 
-export(xml2eco)
 

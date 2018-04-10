@@ -1,7 +1,7 @@
 # Function to go from a PDF file to JSON
 
 
-xml2eco =
+doc2eco =
     # Handle a PDF file as well.
     function(doc.file, ecoextract = getEcoExtractPyScript(),
              results.dir = character(), results.file = file.path(results.dir, gsub("xml$", "rds", basename(doc.file))),
