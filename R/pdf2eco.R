@@ -4,7 +4,7 @@
 xml2eco =
     # Handle a PDF file as well.
     function(doc.file, ecoextract = getEcoExtractPyScript(),
-             results.dir = character(),
+             results.dir = character(), results.file = file.path(results.dir, gsub("xml$", "rds", basename(doc.file))),
              cache.dir = character(), cache.file = file.path(cache.dir, gsub("xml$", "rds", basename(doc.file))),
              section.text = load_text(doc.file, cache.file, cache.dir))
 
@@ -22,7 +22,7 @@ xml2eco =
         if(!dir.exists(results.dir))
             dir.create(results.dir)
         
-        saveRDS(ans, file.path(results.dir, gsub("xml$", "rds", basename(doc.file))))
+        saveRDS(ans, results.file)
     }
     ans
 }
@@ -101,29 +101,3 @@ function(XML)
 }
 
 
-
-getEcoExtractPyScript =
-function()
-{
-  getOption("EcoExtractScript", system.file("python", "ecoextract.py", package = "SpilloverDA"))
-}
-
-
-getEpitatorDBFilename =
-function()
-{
-    val = Sys.getenv("ANNOTATOR_DB_PATH")
-    if(is.na(val) || val == "")
-        val = path.expand("~/.epitator.sqlitedb")
-    val
-}
-
-checkEpitatorDB =
-function(db = getEpitatorDBFilename(), error = TRUE)
-{
-    status = file.exists(db)
-    if(error && !status)
-        stop("Epitator SQLite database doesn't exist: ", db)
-
-    status
-}
