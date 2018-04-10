@@ -87,7 +87,27 @@ function(res, full = TRUE)
 
 # Maybe add one for dates.
 
-
+##' Extract information from extracted results
+##'
+##' These functions extract information from the results of \code{doc2keywords} into
+##' a data.frame.
+##' @aliases getSpecies
+##' @aliases getDiagTest
+##' @aliases getSpeciesAbb
+##' @aliases getCountry
+##' @aliases getVirus
+##' @title Get extracted keywords
+##' @param res the nested list resulting from \code{doc2keywords}
+##' @param full logical, whether the \code{res} is the full results, or only one section
+##' @param type the type of result 
+##' @return a data.frame with
+##' \itemize{
+##'   \item{label: the term as it occurs in the text}
+##'   \item{keyword/species/etc.: the canonical term matched in the dictionary}
+##'   \item{start: the beginning of the term's span.}
+##'   \item{end: the end of the term's span}
+##' }
+##' @author Duncan Temple Lang
 getMisc =
     # toplevel
     # For now assume res is by section
