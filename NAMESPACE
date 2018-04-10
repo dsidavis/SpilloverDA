@@ -1,4 +1,4 @@
-export(doc2eco)
+export(doc2keywords)
 
 export(mkCSV) # Rename this to xlsx
 
