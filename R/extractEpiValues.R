@@ -72,6 +72,18 @@ function(res, full = TRUE)
   getMisc(res, full, type = "diagnostic_test")
 }
 
+getSpeciesAbb =
+function(res, full = TRUE)
+{
+  getMisc(res, full, type = "species_abb")
+}
+
+getCountry =
+function(res, full = TRUE)
+{
+  getMisc(res, full, type = "country")
+}
+
 
 # Maybe add one for dates.
 
