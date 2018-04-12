@@ -60,6 +60,12 @@ function(res, full = TRUE)
   getMisc(res, full, type = "disease")
 }
 
+getVirus2 =
+function(res, full = TRUE)
+{
+  getMisc(res, full, type = "virus")
+}
+
 getSpecies =
 function(res, full = TRUE)
 {
