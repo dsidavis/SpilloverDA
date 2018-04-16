@@ -11,11 +11,14 @@ compTopSect = function(x)
 mkTrainingSet = function(sp, extractResults, extractVar, spVar, resultNames, test = FALSE)
 {
     tmp = lapply(extractResults, function(x) {
-        try({x[,c(extractVar, "sectionName")]})
+        invisible(try({x[,c(extractVar, "sectionName")]}))
     })
     i = !sapply(tmp, is, "try-error")
+    if(all(!i))
+        browser()
+    
     tmp2 = do.call(rbind, tmp[i])
-    # browser()
+
     colnames(tmp2) = c("var", "sectionName")
     # Sep out the combined variables
     tmp2$pdf = rep(resultNames[i], sapply(tmp[i], nrow))
@@ -26,8 +29,18 @@ mkTrainingSet = function(sp, extractResults, extractVar, spVar, resultNames, tes
     tmp3 = lapply(tmp2, function(x){
         if(!test){
             i = grep(basename(unique(x$pdf)), sp$fixedPDF, fixed = TRUE)
-            x$correct = tolower(x[["var"]]) %in% tolower(sp[i, spVar])
-            # browser()i
+            if(length(i) == 0)
+                browser()
+            spCorrect = tolower(unlist(strsplit(sp[i, spVar], ";")))
+            correct = unlist(lapply(tolower(x[["var"]]), function(term) {
+                if(spVar == "virus")
+                    term = gsub(" virus$|encephalitis$", "", term)
+                term = paste0("\\b", term, "\\b")
+                any(grepl(term, x = spCorrect, ignore.case = TRUE))
+            }))
+            if(length(correct) > nrow(x))
+                browser()
+            x$correct = correct
         }
         x$pdfFreq = freqBy(x, extractVar = "var")
         x = freqBySect(x, extractVar = "var")
@@ -136,3 +149,17 @@ collapseTestSets = function(tar, test_sets)
     })
     do.call(rbind, ans)
 }
+
+collectMissing = function(missing, sp, spVar)
+{
+    ans = lapply(names(missing), function(nm){
+        i = grep(nm, sp$fixedPDF, fixed = TRUE)
+        tmp = unique(sp[i, spVar])
+        tmp[!tmp %in% c("","?", "unknown","Unknown")]
+    })
+    data.frame(spVar = unlist(ans),
+               pdf = rep(names(missing), sapply(ans, length)),
+               stringsAsFactors = FALSE)
+}
+
+
