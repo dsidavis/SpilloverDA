@@ -1,6 +1,11 @@
 # library(SpilloverDA)
-
 # Functions to create a dashboard of Type I and II from Species.csv and EpiResults
+summarizeErrors = function(errors)
+{
+    
+}
+
+
 getErrors = function(extractResults = readRDS("OldPDF_ecoResults.rds"),
                        sp = readRDS("SpeciesWithDatesForPlots.rds"),
                        fun = NULL,
