@@ -60,12 +60,9 @@ getType1 = function(trainset)
         tt = tapply(x$correct, x$var, sum)
         type1 = names(tt)[tt == 0]
         if(length(type1) == 0)
-            type1 = NA
+            type1 = ""
 
         x[x$var %in% type1,]
-        # data.frame(type1 = type1,
-                  # pdf = unique(x$pdf),
-                  # stringsAsFactors = FALSE)
     })
     do.call(rbind, ans)
 }

@@ -11,4 +11,5 @@ export(getLocation, getMisc, getVirus, getVirus2,
        getSpecies,
        getDiagTest, getCountry)
 
+export(getErrors, getType1, getType1)
 
