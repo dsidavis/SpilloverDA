@@ -28,6 +28,7 @@ mkTrainingSet = function(sp, extractResults, extractVar, spVar, resultNames, tes
             if(length(correct) > nrow(x))
                 browser()
             x$correct = correct
+            x
         }
     })
     
@@ -44,6 +45,7 @@ mkTestSet = function(extractResults, extractVar, resultNames)
             x = extractResults[[i]][,c(extractVar, "sectionName")]
             colnames(x) = c("var", "sectionName")
             x$pdf = resultNames[i]
+            x = sepVars(x)
             x$pdfFreq = freqBy(x, extractVar = "var")
             x = freqBySect(x, extractVar = "var")
             x
@@ -56,7 +58,6 @@ mkTestSet = function(extractResults, extractVar, resultNames)
     tmp2 = do.call(rbind, tmp[i])
 
     # Sep out the combined variables
-    tmp2 = sepVars(tmp2)
     rownames(tmp2) = NULL
 
     tmp2
@@ -65,9 +66,10 @@ mkTestSet = function(extractResults, extractVar, resultNames)
 sepVars = function(df)
 {
     tmp = strsplit(as.character(df$var), ";")
+    ll = sapply(tmp, length)
     data.frame(var = XML:::trim(unlist(tmp)),
-               sectionName = rep(df$sectionName, sapply(tmp, length)),
-               pdf = rep(df$pdf, sapply(tmp, length)),
+               sectionName = rep(df$sectionName, ll),
+               pdf = rep(df$pdf, ll), 
                stringsAsFactors = FALSE)
 }
 
