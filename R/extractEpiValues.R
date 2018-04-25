@@ -90,6 +90,11 @@ function(res, full = TRUE)
   getMisc(res, full, type = "country")
 }
 
+getGoldStandTest =
+function(res, full = TRUE)
+{
+  getMisc(res, full, type = "gs_diagnostic_test")
+}
 
 # Maybe add one for dates.
 
@@ -133,7 +138,7 @@ function(sec, nm, type = "disease")
     if(!("resolved_keyword" %in% names(sec)))
         return(bad)
     
-    w = sapply(sec$resolved_keyword, function(x) all(sapply(x$resolutions, function(x) x$entity["type"]) == type))
+    w = sapply(sec$resolved_keyword, function(x) any(sapply(x$resolutions, function(x) x$entity["type"]) == type))
     if(!any(w))
         return(bad)
     ans = do.call(rbind, lapply(sec$resolved_keyword[w], getMiscInfo, type = type))
