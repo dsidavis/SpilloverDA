@@ -10,20 +10,7 @@ compTopSect = function(x)
 
 mkTrainingSet = function(sp, extractResults, extractVar, spVar, resultNames, test = FALSE)
 {
-    tmp = lapply(extractResults, function(x) {
-        invisible(try({x[,c(extractVar, "sectionName")]}))
-    })
-    i = !sapply(tmp, is, "try-error")
-    if(all(!i))
-        browser()
-    
-    tmp2 = do.call(rbind, tmp[i])
-
-    colnames(tmp2) = c("var", "sectionName")
-    # Sep out the combined variables
-    tmp2$pdf = rep(resultNames[i], sapply(tmp[i], nrow))
-    tmp2 = sepVars(tmp2)
-    
+    tmp2 = mkTestSet(extractResults, extractVar, resultNames)
     tmp2 = split(tmp2, tmp2$pdf)
     
     tmp3 = lapply(tmp2, function(x){
@@ -42,15 +29,37 @@ mkTrainingSet = function(sp, extractResults, extractVar, spVar, resultNames, tes
                 browser()
             x$correct = correct
         }
-        x$pdfFreq = freqBy(x, extractVar = "var")
-        x = freqBySect(x, extractVar = "var")
-        x
     })
     
     tmp3 = do.call(rbind, tmp3)
     rownames(tmp3) = NULL
 
     tmp3
+}
+
+mkTestSet = function(extractResults, extractVar, resultNames)
+{
+    tmp = lapply(seq(along = extractResults), function(i) {
+        invisible(try({
+            x = extractResults[[i]][,c(extractVar, "sectionName")]
+            colnames(x) = c("var", "sectionName")
+            x$pdf = resultNames[i]
+            x$pdfFreq = freqBy(x, extractVar = "var")
+            x = freqBySect(x, extractVar = "var")
+            x
+        }))
+    })
+    i = !sapply(tmp, is, "try-error")
+    if(all(!i))
+        browser()
+    
+    tmp2 = do.call(rbind, tmp[i])
+
+    # Sep out the combined variables
+    tmp2 = sepVars(tmp2)
+    rownames(tmp2) = NULL
+
+    tmp2
 }
 
 sepVars = function(df)
@@ -77,9 +86,6 @@ freqBySect = function(x, extractVar)
     tmp$sectFreq = unlist(ans)
     tmp
 }
-
-
-
 
 reduceSects = function(sectionNames, pdf, n = 30,
                        commonSections = c("<other>", "abstract", "ackowledgements",
