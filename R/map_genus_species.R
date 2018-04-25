@@ -31,3 +31,40 @@ expand_abbrevs = function(txt)
 
     return(paste(mod_txt, collapse = " "))
 }
+
+map_abbrevs = function(fulls, abbrevs)
+{
+    if(!is.character(abbrevs$species_abb))
+        abbrevs$species_abb = as.character(abbrevs$species_abb)
+    if(!is.character(fulls$species))
+        fulls$species = as.character(fulls$species)
+    
+    u_abb = unique(abbrevs$species_abb)
+    u_full = unique(unlist(strsplit(fulls$species, ";")))
+    # browser()
+    s_abbrevs = strsplit(u_abb, " +")
+    poss_full = sapply(s_abbrevs, function(x) {
+        i = grep(x[2], u_full)
+        if(length(i) != 1)
+            return(character())
+        if(substring(x[1], 1, 1) == substring(u_full[i], 1, 1))
+            return(u_full[i])
+        return(character())
+    })
+    idx = match(abbrevs$species_abb, u_abb)
+    ans = abbrevs
+    ans$species = poss_full[idx]
+    ans
+}
+
+combine_species = function(extractSpecies, extractSpAbb)
+{
+    if(nrow(extractSpecies) == 0 || nrow(extractSpAbb) == 0)
+        return(extractSpecies)
+    
+    expandAbb = map_abbrevs(extractSpecies, extractSpAbb)
+    expandAbb = expandAbb[expandAbb$species != "", colnames(extractSpecies)]
+    if(!is.character(extractSpecies$species))
+        extractSpecies$species = as.character(extractSpecies$species)
+    rbind(extractSpecies, expandAbb)
+}
