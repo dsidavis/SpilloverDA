@@ -8,28 +8,30 @@ compTopSect = function(x)
     table(x$correct[i], x$sectionName[i])
 }
 
-mkTrainingSet = function(sp, extractResults, extractVar, spVar, resultNames, test = FALSE)
+mkTrainingSet = function(sp, extractResults, extractVar, spVar, resultNames)
 {
     tmp2 = mkTestSet(extractResults, extractVar, resultNames)
     tmp2 = split(tmp2, tmp2$pdf)
     
     tmp3 = lapply(tmp2, function(x){
-        if(!test){
-            i = grep(basename(unique(x$pdf)), sp$fixedPDF, fixed = TRUE)
-            if(length(i) == 0)
-                browser()
+        i = grep(basename(unique(x$pdf)), sp$fixedPDF, fixed = TRUE)
+        if(length(i) == 0)
+            browser()
+        if(is.character(sp[i, spVar])){
             spCorrect = tolower(unlist(strsplit(sp[i, spVar], ";")))
-            correct = unlist(lapply(tolower(x[["var"]]), function(term) {
-                if(spVar == "virus")
-                    term = gsub(" virus$|encephalitis$", "", term)
-                term = paste0("\\b", term, "\\b")
-                any(grepl(term, x = spCorrect, ignore.case = TRUE))
-            }))
-            if(length(correct) > nrow(x))
-                browser()
-            x$correct = correct
-            x
+        }else{
+            spCorrect = sp[i,spVar]
         }
+        correct = unlist(lapply(tolower(x[["var"]]), function(term) {
+            if(spVar == "virus")
+                term = gsub(" virus$|encephalitis$", "", term)
+            term = paste0("\\b", term, "\\b")
+            any(grepl(term, x = spCorrect, ignore.case = TRUE))
+        }))
+        if(length(correct) > nrow(x))
+            browser()
+        x$correct = correct
+        x
     })
     
     tmp3 = do.call(rbind, tmp3)
@@ -65,6 +67,9 @@ mkTestSet = function(extractResults, extractVar, resultNames)
 
 sepVars = function(df)
 {
+    if(!is.character(df$var))
+        return(df)
+    
     tmp = strsplit(as.character(df$var), ";")
     ll = sapply(tmp, length)
     data.frame(var = XML:::trim(unlist(tmp)),
