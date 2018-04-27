@@ -24,7 +24,7 @@ getDate =
 function(x)
 {
     tmp = lapply(x, "[[", "date")
-    browser()
+    # browser()
     i = sapply(tmp, length)
     ans = lapply(tmp[i > 0 ], function(x) {
         ll = do.call(rbind, strsplit(x, ":"))
@@ -36,7 +36,7 @@ function(x)
         
         })
     ans = do.call(rbind, ans)
-    ans$section = rep(names(x), i)  
+    ans$sectionName = rep(names(x), i)  
     ans
 }
 
