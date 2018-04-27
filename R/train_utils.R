@@ -15,8 +15,11 @@ mkTrainingSet = function(sp, extractResults, extractVar, spVar, resultNames)
     
     tmp3 = lapply(tmp2, function(x){
         i = grep(basename(unique(x$pdf)), sp$fixedPDF, fixed = TRUE)
-        if(length(i) == 0)
-            browser()
+        if(length(i) == 0){
+            # browser()
+            x$correct = NA
+            return(x)
+        }
         if(is.character(sp[i, spVar])){
             spCorrect = tolower(unlist(strsplit(sp[i, spVar], ";")))
         }else{
@@ -25,7 +28,7 @@ mkTrainingSet = function(sp, extractResults, extractVar, spVar, resultNames)
         correct = unlist(lapply(tolower(x[["var"]]), function(term) {
             if(spVar == "virus")
                 term = gsub(" virus$|encephalitis$", "", term)
-            term = paste0("\\b", term, "\\b")
+            term = paste0("\\b", gsub("\\(|\\)","",term), "\\b")
             any(grepl(term, x = spCorrect, ignore.case = TRUE))
         }))
         if(length(correct) > nrow(x))
