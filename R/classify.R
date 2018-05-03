@@ -1,10 +1,47 @@
+##' Train Binary Tree Classifier 
+##'
+##' This function takes a \code{data.frame} created by \code{mkTrainingSet}
+##' and trains a classifier using the binary recursive partioning algorithm in
+##' the \code{partykit::ctree} function.
+##'
+##' In order to train the classifier, the sectionNames are reduced to a canonical set
+##' using the function \code{reduceSects}. Sections not recognized by \code{reduceSects}
+##' is assigned the label 'misc'
+##' 
+##' @title Train Binary Classifier
+##' @param trainSet a \code{data.frame} created by \code{mkTrainingSet}. This data
+##'     must have a logical column named "correct" 
+##' @return a training model object of class 'party'
+##' @author Matt Espe
+##' @examples
+##' if(FALSE){
+##' trainSet = mkTrainingSet()
+##' mod = trainTreeClassifier(trainSet)
+##' }
+##' 
 trainTreeClassifier = function(trainSet)
 {
     trainSet$sectionName = reduceSects(trainSet$sectionName, trainSet$pdf) 
     ctree(as.integer(correct) ~ sectionName + pdfFreq + sectFreq, data = trainSet)
 }
 
-trimExtractResults = function(testSet, mod, threshold = numeric())
+##' Uses a trained classification model to assign a score/probability
+##' of being 'correct' to each term.
+##'
+##' \code{scoreExtractResults} takes a \code{data.frame} of extracted results
+##' created by \code{mkTestSet} and a model trained by \code{trainTreeClassifier}
+##' (or some other classification algorithm), and assigns a score/probability to each
+##' term in the \code{data.frame}.
+##' 
+##' @title Score Extracted Terms 
+##' @param testSet a \code{data.frame} created by \code{mkTestSet}
+##' @param mod a classification model which with method defined for \code{predict}
+##' @param threshold optional, a numeric value. Terms scored lower than this value
+##'     will be excluded in the returned object.
+##' @return a \code{data.frame} with the term, the average score/probability,
+##'     and the sections which that term occurred in the text.
+##' @author Matt Espe
+scoreExtractResults = function(testSet, mod, threshold = numeric())
 {
     testSet = testSet[complete.cases(testSet),]
     testSet$sectionName = reduceSects(testSet$sectionName, testSet$pdf)
