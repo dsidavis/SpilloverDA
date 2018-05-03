@@ -5,7 +5,7 @@ export(mkCSV) # Rename this to xlsx
 import(ReadPDF)
 import(RJSONIO)
 import(stringi)
-
+import(partykit)
 
 export(getLocation, getMisc, getVirus, getVirus2,
        getSpecies,
@@ -13,3 +13,6 @@ export(getLocation, getMisc, getVirus, getVirus2,
 
 export(getErrors, getType1, getType1)
 
+export(trainTreeClassifier)
+
+export(trimExtractResults, resultsByPDF, getMetaInfo)
