@@ -30,12 +30,6 @@ collapseResults = function(testSet)
     ans
 }
 
-mkJSON = function(resultsList, pdfNames, saveDir = character())
-{
-    ans = resultsByPDF(resultsList, pdfNames, saveDir)
-    ans
-}
-
 
 resultsByPDF = function(resultsList, pdfNames, saveDir = character(),
                         outfiles = file.path(saveDir,
@@ -54,17 +48,35 @@ resultsByPDF = function(resultsList, pdfNames, saveDir = character(),
     ans
 }
 
-getMetaInfo = function(extractResults)
+getMetaInfo = function(extractResults, saveDir = character(),
+                       outfiles = file.path(saveDir,
+                                 gsub("\\.pdf$|\\.xml$", "_meta.json",
+                                      basename(names(extractResults)))))
 {
-    lapply(seq(along = extractResults), function() {
-        data.frame(title = extractResults[[i]]$title$txt,
-                   abstract = extractResults[[i]]$abstract$txt,
-                   pdf = names(extractResults)[i],
-                   year = integer(),
-                   stringsAsFactors = FALSE)
-        })
+    lapply(seq(along = extractResults), function(i, ee, saveDir, outfiles) { 
+
+        res = data.frame(title = NA,
+                   abstract = NA,
+                   pdf = names(ee)[i],
+                   year = NA,
+                   stringsAsFactors = FALSE)       
+
+        if(!is(ee[[i]]$title, "try-error"))
+            res$title = ee[[i]]$title$txt
+
+        if(!is(ee[[i]]$abstract, "try-error"))
+            res$abstract = ee[[i]]$abstract$txt
+
+        if(length(saveDir) != 0){
+            if(!dir.exists(saveDir))
+                dir.create(saveDir)
+            saveResultsJSON(res, outfiles[i])
+        }
+
+        res
+        }, ee = extractResults, saveDir = saveDir, outfiles = outfiles)
 }
-    
+
 getExtractByPDF = function(resultsList, pdfName)
 {
     lapply(resultsList, function(x) {
