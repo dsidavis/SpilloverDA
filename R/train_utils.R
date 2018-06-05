@@ -71,7 +71,7 @@ mkTestSet = function(extractResults, extractVar, resultNames)
 sepVars = function(df)
 {
     if(!is.character(df$var))
-        return(df)
+        df$var = as.character(df$var)
     
     tmp = strsplit(as.character(df$var), ";")
     ll = sapply(tmp, length)
@@ -141,12 +141,20 @@ standardizeSectionNames = function(sects)
     sects
 }
 
-commonSections = c("", "<other>", "abstract", "ackowledgements", "author contributions", 
-                   "author ref", "author summary", "background", "body", "conclusions", 
-                   "control of vsv", "discussion", "future directions", "impacts", 
-                   "introduction", "methods", "misc", "natural cycles of infection", 
-                   "results", "results and discussion", "sources and manufacturers", 
-                   "summary", "tables", "the disease", "the study", "title")
+commonSections = c("<other>", "abstract", "ackowledgements",
+                   "author contributions","author ref",
+                   "author summary", "background", "body",
+                   "conclusions", "discussion",
+                   "future directions", "impacts", 
+                   "introduction", "methods", 
+                   "natural cycles of infection", 
+                   "results", "results and discussion",
+                   "sources and manufacturers", 
+                   "summary", "tables", "the disease",
+                   "the study", "title")
+                       
+dateSections = c("Received", "footer", "abstract", "filename", "MonthNameYear.TextRegEx", 
+                 "Title", "AboveTitle", "header", "unknown", "NIH Public Access")
 
 collapseTestSets = function(tar, test_sets)
 {

@@ -73,9 +73,12 @@ resultsByPDF = function(resultsList, pdfNames, saveDir = character(),
                                              gsub("\\.pdf$|\\.xml$", "_extract.json",
                                                   basename(pdfNames))))
 {
+
     ans = lapply(seq(along = pdfNames), function(i){
         ans = getExtractByPDF(resultsList, pdfNames[i])
-        ans = lapply(ans, function(x) x[order(x$avg_score, decreasing = TRUE),])
+        # browser()
+        ans = lapply(ans, function(x) x[order(x$probs, decreasing = TRUE),c("values", "sections", "probs")])
+        
         if( length(saveDir) != 0 ){
             if(!dir.exists(saveDir))
                 dir.create(saveDir)
@@ -94,10 +97,10 @@ getMetaInfo = function(extractResults, saveDir = character(),
 
         res = data.frame(title = NA,
                    abstract = NA,
-                   pdf = names(ee)[i],
-                   year = NA,
+                   pdf = basename(names(ee)[i]),
+                   year = as.integer(gsub(".*([0-9]{4}).*", "\\1", names(ee)[i])),
                    stringsAsFactors = FALSE)       
-
+        
         if(!is(ee[[i]]$title, "try-error"))
             res$title = ee[[i]]$title$txt
 
@@ -127,3 +130,19 @@ saveResultsJSON = function(ans, outfile)
     return(outfile)
 }
     
+cullDates = function(dateDF)
+{
+    tmp = sapply(dateDF$var, getYears)
+    i = sapply(tmp, length) != 0
+    ans = dateDF[i,]
+    ans$var = do.call(c, tmp[i])
+    ans
+}
+
+getYears = function(dates,
+                    pattern = "20[01][0-9]|1[789][0-9]{2}",
+                    m = regexpr(pattern, dates))
+{
+    regmatches(dates, m)
+}
+
