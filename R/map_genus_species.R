@@ -57,7 +57,7 @@ map_abbrevs = function(fulls, abbrevs)
     ans
 }
 
-combine_species = function(extractSpecies, extractSpAbb)
+combineSpecies = function(extractSpecies, extractSpAbb)
 {
     if(nrow(extractSpecies) == 0 || nrow(extractSpAbb) == 0)
         return(extractSpecies)

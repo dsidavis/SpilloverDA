@@ -98,17 +98,7 @@ freqBySect = function(x, extractVar)
 }
 
 reduceSects = function(sectionNames, pdf, n = 30,
-                       commonSections = c("<other>", "abstract", "ackowledgements",
-                                          "author contributions","author ref",
-                                          "author summary", "background", "body",
-                                          "conclusions", "discussion",
-                                          "future directions", "impacts", 
-                                          "introduction", "methods", 
-                                          "natural cycles of infection", 
-                                          "results", "results and discussion",
-                                          "sources and manufacturers", 
-                                          "summary", "tables", "the disease",
-                                          "the study", "title")
+                       commonSections = c(commonSects, dateSects)
                        )
 {
     sectionNames = standardizeSectionNames(sectionNames)
@@ -141,7 +131,7 @@ standardizeSectionNames = function(sects)
     sects
 }
 
-commonSections = c("<other>", "abstract", "ackowledgements",
+commonSects = c("<other>", "abstract", "ackowledgements",
                    "author contributions","author ref",
                    "author summary", "background", "body",
                    "conclusions", "discussion",
@@ -153,7 +143,7 @@ commonSections = c("<other>", "abstract", "ackowledgements",
                    "summary", "tables", "the disease",
                    "the study", "title")
                        
-dateSections = c("Received", "footer", "abstract", "filename", "MonthNameYear.TextRegEx", 
+dateSects = c("Received", "footer", "abstract", "filename", "MonthNameYear.TextRegEx", 
                  "Title", "AboveTitle", "header", "unknown", "NIH Public Access")
 
 collapseTestSets = function(tar, test_sets)

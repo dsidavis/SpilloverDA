@@ -8,11 +8,14 @@ import(stringi)
 import(partykit)
 
 export(getLocation, getMisc, getVirus, getVirus2,
-       getSpecies,
-       getDiagTest, getCountry)
+       getSpecies, getDate,
+       getDiagTest, getCountry,
+       getGoldStandTest, getSpeciesAbb)
+
+export(combineSpecies, cullDates)
 
 export(getErrors, getType1, getType1)
 
-export(trainTreeClassifier)
+export(trainTreeClassifier, mkTrainingSet, mkTestSet)
 
-export(trimExtractResults, resultsByPDF, getMetaInfo)
+export(scoreExtractResults, resultsByPDF, getMetaInfo)
