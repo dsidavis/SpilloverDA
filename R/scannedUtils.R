@@ -5,11 +5,13 @@ getPDFconvertUtil = function()
 
 PDFtoImage = function(pdf_file, out_file = character(),
                       convertUtil = getPDFconvertUtil(),
+                      out_dir = tempdir(),
                       out_format = "png",
                       args = c("-density 300", "-background white", "-alpha remove", "-verbose"))
 {
     if(length(out_file) == 0 & grepl("\\.pdf$", pdf_file))
-        out_file = gsub("\\.pdf$", paste0(".", out_format), pdf_file)
+        out_file = file.path(out_dir,
+                             gsub("\\.pdf$", paste0(".", out_format), basename(pdf_file)))
     
     cmd = sprintf("%s %s '%s' '%s'", convertUtil,
                   paste(args, collapse = " "),
@@ -25,24 +27,30 @@ PDFtoImage = function(pdf_file, out_file = character(),
 
 ocrPDF = function(pdf_file,
                   images = PDFtoImage(pdf_file),
+                  titlePage = 1L,
+                  titleThreshold = 0.9,
+                  ocr_engine = "OEM_LSTM_ONLY",
+                  pageSeg = "PSM_AUTO",
                   ...)
 {
-    apis = lapply(images, Rtesseract::tesseract, ...)
-    
-    do.call(rbind, ans)
+    apis = lapply(images, Rtesseract::tesseract,
+                  engineMode = ocr_engine, pageSegMode = pageSeg, ...)
+    title = getTitleWords(GetBoxes(apis[[titlePage]]), titleThreshold)
+    text = paste(unlist(lapply(apis, GetText, level = "para")), collapse = " ")
+    return(list(title = title, text = text))
 }
                   
 findTitle = function(api, pages = 1)
 {
     bb = do.call(rbind, lapply(api[pages], GetBoxes))
     titleWords = getTitleWords(bb, level = "textline")
-    assymbleTitle(bb[bb$text %in% titleWords,])
+
 }
 
-getTitleWords = function(boxes, threshold = 0.90)
+getTitleWords = function(boxes, threshold)
     # Assumptions:
     # 1. Title is on top half of first page
-    # 2. Title is larger text than main text
+    # 2. Title is larger than <threshold>% of main text
     # 3. Does not "look" like the authors
     # 4. Does not contain words common in journal titles
 {
@@ -60,8 +68,3 @@ getTitleWords = function(boxes, threshold = 0.90)
     return(gsub("^ +|\\n| +$", "", title))
 }
 
-mostUsedTextSize = function(textSize)
-{
-    dd = density(textSize)
-    dd$x[which.max(dd$y)]
-}
