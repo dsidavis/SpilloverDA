@@ -1,0 +1,98 @@
+---
+title: "Extracting keywords from a PDF using SpilloverDA"
+author: "Matt Espe"
+date: "2019 May 1"
+vignette: >
+	\VignetteIndexEntry{Extracting keywords from a PDF using SpilloverDA}
+	\VignetteEngine{knitr::rmarkdown}
+	\usepackage[utf8]{inputenc}
+---
+
+SpilloverDA includes functions which allow you to extract keywords
+from a PDF document.
+
+# Setup
+
+In addition to the R package requirements, to fully use these tools
+you will need additional software on your system:
+
+1. pdftohtml, preferrably our extended version available
+   [on github](https://github.com/dsidavis/pdftohtml). Please see
+   installation instructions on that page.
+   
+2. Our fork of the Epitator tool for keyword extraction, found [here]().
+   
+3. The Epitator dictionary will need to be created. Instructions
+   [here]().
+   
+## Additional setup: OCR
+
+If you would like to extract information from documents which are
+scanned, i.e., are only an image without text which can be selected
+and copied out of the pdf, you will need additional packages/software
+to do OCR (Optical Character Recognition) prior to extracting keywords:
+
+1. Rtesseract and tesseract: Rtesseract is available from
+   [github](https://github.com/duncantl/Rtesseract), and requires that
+   you also install [Tesseract](https://github.com/tesseract-ocr/) and
+   language files. Installation instructions are available on each of
+   those pages.
+   
+2. Imagemagik `convert` or similar utility to convert the PDF file to
+   an image file, e.g. PNG, JPG, etc.
+
+# Overview of process
+
+## Extraction of text
+
+1. The first step is converting the PDF document to an XML file using
+pdftohtml. SpilloverDA uses a convienence function
+`ReadPDF::convertPDF2XML()` to do the conversion by default.
+
+2. The XML is analyzed by `ReadPDF::isScanned()` to determine if OCR
+   will be needed. 
+   
+**If OCR is NOT needed:**
+
+3. The text is extracted from the XML document and is separated into sections by
+   `ReadPDF::readXMLSections()`
+
+**If OCR IS needed:**
+
+3. The PDF is OCRed to text by `ocrPDF()`
+
+  a. The original PDF is converted to image files using a conversion
+utility, e.g. `convert`
+
+  b. The image files are OCR-ed by `Rtesseract::tessreact()`
+
+  c. The text is reconstructed into sections *NOTE: Currently, the
+identification of sections from the OCR results is not fully implimented.*
+
+## Extraction of keywords
+
+4. The sectioned text is written to a tmp file 
+
+5. The tmp file is used as an input to Epitator, which extracts the
+   keywords and writes the
+   results to a second tmp file as JSON.
+
+6. The JSON is read back into R using `RSJONIO::fromJSON()`
+
+## Scoring of results
+
+**NEEDS WORK**
+
+7. Terms from the JSON are collected into a data.frame, along with
+   relevant context information (number of mentions, sections where
+   the term occurred, etc.)
+   
+8. The terms are scored using a trained classifier. Currently, the
+   classifier is a random-forest model trained on hand-entered data
+   using the `partykit` package.
+   
+9. The scored results are returned as a data.frame
+
+## Uploading to the ZooUI
+
+
