@@ -71,27 +71,38 @@ identification of sections from the OCR results is not fully implimented.*
 
 ## Extraction of keywords
 
-4. The sectioned text is written to a tmp file 
+4. The extraction of keywords is handled by `doc2keyword`
 
-5. The tmp file is used as an input to Epitator, which extracts the
+  a. The sectioned text is written to a tmp file 
+
+  b. The tmp file is used as an input to Epitator, which extracts the
    keywords and writes the
    results to a second tmp file as JSON.
 
-6. The JSON is read back into R using `RSJONIO::fromJSON()`
+  c. The JSON is read back into R using `RSJONIO::fromJSON()`
 
-## Scoring of results
+## Extracting data from JSON
+
+Since the results from JSON are a nested list, convienence functions
+are used to extract the results into a data.frame
 
 **NEEDS WORK**
 
-7. Terms from the JSON are collected into a data.frame, along with
+
+## Scoring of results
+
+
+**NEEDS WORK**
+
+5. Terms from the JSON are collected into a data.frame, along with
    relevant context information (number of mentions, sections where
    the term occurred, etc.)
    
-8. The terms are scored using a trained classifier. Currently, the
+6. The terms are scored using a trained classifier. Currently, the
    classifier is a random-forest model trained on hand-entered data
    using the `partykit` package.
    
-9. The scored results are returned as a data.frame
+7. The scored results are returned as a data.frame
 
 ## Uploading to the ZooUI
 
