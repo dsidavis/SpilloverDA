@@ -20,7 +20,7 @@ you will need additional software on your system:
    [on github](https://github.com/dsidavis/pdftohtml). Please see
    installation instructions on that page.
    
-2. Our fork of the Epitator tool for keyword extraction, found [here]().
+2. Our fork of the Epitator tool for keyword extraction, found [here](https://github.com/dsidavis/EpiTator).
    
 3. The Epitator dictionary will need to be created. Instructions
    [here]().
@@ -76,18 +76,45 @@ identification of sections from the OCR results is not fully implimented.*
   a. The sectioned text is written to a tmp file 
 
   b. The tmp file is used as an input to Epitator, which extracts the
-   keywords and writes the
-   results to a second tmp file as JSON.
+   keywords and writes the results to a second tmp file as JSON.
 
   c. The JSON is read back into R using `RSJONIO::fromJSON()`
 
 ## Extracting data from JSON
 
-Since the results from JSON are a nested list, convienence functions
-are used to extract the results into a data.frame
-
 **NEEDS WORK**
 
+Since the results from JSON are a nested list, convienence functions
+are used to extract the results into a data.frame;
+
+  - getLocation
+  - getSpecies
+  - getGoldStandardTest
+  - getVirus2
+  - getSpeciesAbb
+  - getDate
+  
+These different data types are kept separate for now, since each data type needs a separate
+model to assign the score. A typical use of these would be:
+
+```
+funs = c(getLocation, getSpecies, getGoldStandTest, getVirus2,
+         getSpeciesAbb, getDate)
+
+vars = c("location", "species", "diagtest", "virus", "sp_abb", "date")
+
+test.vars = lapply(funs, function(fn) {
+    try(fn(pdf_results))
+})
+```
+
+This results in a list, with each data type being an element in the
+list. Within each element, there will be a data.frame of extracted
+results. 
+
+Next, these need to be further collapsed using `mkTestSet()` which
+collects multiple mentions into a single row per term, with the
+relevant metrics (number of mentions, sections, etc) added to the data.frame.
 
 ## Scoring of results
 
